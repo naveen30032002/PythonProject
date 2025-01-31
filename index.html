@@ -3,106 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forecast Friend</title>
+    <title>Weather App</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: url('weather.jpg') no-repeat center center fixed;
-            background-size: cover;
-            transition: background-image 0.5s ease-in-out;
+            height: 100vh;
+            margin: 0;
         }
-
-        .container {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            max-width: 400px;
-            width: 100%;
+        .weather-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
         }
-
-        h2 {
+        .input-container {
             margin-bottom: 20px;
-            font-size: 2rem;
-            color: #333;
         }
-
-        input {
+        .input {
             padding: 10px;
-            font-size: 1rem;
-            width: 70%;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 10px;
+            border-radius: 4px;
+            width: 200px;
         }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1rem;
+        .button {
+            padding: 10px;
             border: none;
-            border-radius: 5px;
-            background-color: green;
-            color: white;
+            border-radius: 4px;
+            background: #007bff;
+            color: #fff;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-
-        button:hover {
-            background-color: purple;
+        .button:hover {
+            background: #0056b3;
         }
-
-        #weatherResult {
-            margin-top: 20px;
-            font-size: 1.2rem;
+        .error {
             color: red;
         }
-
-        #weatherResult h3 {
-            margin-bottom: 10px;
-            font-size: 1.5rem;
-            color: #007BFF;
+        .weather-info {
+            margin-top: 20px;
         }
-
-        #weatherResult p {
-            margin: 5px 0;
+        .city-name {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .temperature {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .description {
+            font-size: 16px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Forecast Friend</h2>
-        <input type="text" id="city" placeholder="Enter city">
-        <button onclick="getWeather()">Get Weather</button>
-        <div id="weatherResult"></div>
+    <div class="weather-container">
+        <h1 class="title">Weather App</h1>
+        <div class="input-container">
+            <input type="text" id="city-input" class="input" placeholder="Enter city name">
+            <button onclick="fetchWeather()" class="button">Get Weather</button>
+        </div>
+        <p id="error" class="error"></p>
+        <div id="weather-info" class="weather-info" style="display: none;">
+            <h2 id="city-name" class="city-name"></h2>
+            <p id="temperature" class="temperature"></p>
+            <p id="description" class="description"></p>
+        </div>
     </div>
-
     <script>
-        async function getWeather() {
-            let city = document.getElementById("city").value;  // Get city name from input
-            if (!city) {
-                alert("Please enter a city name");
-                return;
-            }
-
-            let response = await fetch(`http://127.0.0.1:5000/weather?city=${city}`);
-            let data = await response.json();
-
-            if (data.error) {
-                document.getElementById("weatherResult").innerHTML = `<p style="color:red;">${data.error}</p>`;
-                document.body.style.backgroundImage = ""; // Clear background if error
-            } else {
-                document.getElementById("weatherResult").innerHTML = `
-                    <h3>${data.city}</h3>
-                    <p>Temperature: ${data.temperature}°C</p>
-<!--                    <p>Weather: ${data.weather}</p> -->
-                `;
+        async function fetchWeather() {
+            const city = document.getElementById('city-input').value;
+            try {
+                const response = await fetch(/weather?city=${city});
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+                const weather = await response.json();
+                document.getElementById('city-name').textContent = weather.name;
+                document.getElementById('temperature').textContent = ${weather.main.temp} °C;
+                document.getElementById('description').textContent = weather.weather[0].description;
+                document.getElementById('weather-info').style.display = 'block';
+                document.getElementById('error').textContent = '';
+            } catch (err) {
+                document.getElementById('error').textContent = err.message;
+                document.getElementById('weather-info').style.display = 'none';
             }
         }
     </script>
